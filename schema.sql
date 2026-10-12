@@ -1,1 +1,24 @@
 
+-- Expense Tracker & Analytics System - database schema (SQLite)
+
+CREATE TABLE IF NOT EXISTS users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    username      TEXT    NOT NULL UNIQUE,
+    salt          TEXT    NOT NULL,
+    password_hash TEXT    NOT NULL,
+    created_at    TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL,
+    type        TEXT    NOT NULL CHECK (type IN ('income', 'expense')),
+    category    TEXT    NOT NULL,
+    amount      REAL    NOT NULL CHECK (amount > 0),
+    date        TEXT    NOT NULL,              -- YYYY-MM-DD
+    description TEXT    DEFAULT '',
+    created_at  TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_txn_user_date ON transactions (user_id, date);
